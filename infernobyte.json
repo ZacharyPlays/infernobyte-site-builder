@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "name": "InfernoByte Site Builder",
+  "description": "Visual site builder runtime — renders published schema from the InfernoByte panel.",
+  "env": [
+    {
+      "key": "DATABASE_URL",
+      "label": "MongoDB",
+      "required": true,
+      "secret": true,
+      "managed": true
+    },
+    {
+      "key": "REDIS_URL",
+      "label": "Redis",
+      "required": false,
+      "secret": true,
+      "managed": true
+    },
+    {
+      "key": "INFERNOBYTE_DEMO_MODE",
+      "label": "Demo mode",
+      "required": false,
+      "secret": false,
+      "managed": true
+    },
+    {
+      "key": "SITE_SCHEMA_URL",
+      "label": "Schema API URL",
+      "required": true,
+      "secret": false,
+      "managed": true
+    },
+    {
+      "key": "SITE_SCHEMA_SECRET",
+      "label": "Schema HMAC secret",
+      "required": true,
+      "secret": true,
+      "managed": true
+    },
+    {
+      "key": "SITE_ORDER_ID",
+      "label": "Order ID",
+      "required": true,
+      "secret": false,
+      "managed": true
+    },
+    {
+      "key": "SITE_URL",
+      "label": "Public URL",
+      "required": false,
+      "secret": false,
+      "managed": true
+    },
+    {
+      "key": "JWT_SECRET",
+      "label": "JWT secret",
+      "required": false,
+      "secret": true
+    },
+    {
+      "key": "ADMIN_EMAIL",
+      "label": "Admin email",
+      "required": false,
+      "secret": false
+    },
+    {
+      "key": "SQUARE_APPLICATION_ID",
+      "label": "Square Application ID",
+      "required": false,
+      "secret": false
+    },
+    {
+      "key": "SQUARE_ACCESS_TOKEN",
+      "label": "Square Access Token",
+      "required": false,
+      "secret": true
+    },
+    {
+      "key": "SQUARE_LOCATION_ID",
+      "label": "Square Location ID",
+      "required": false,
+      "secret": false
+    },
+    {
+      "key": "RESEND_API_KEY",
+      "label": "Resend API key",
+      "required": false,
+      "secret": true
+    },
+    {
+      "key": "FROM_EMAIL",
+      "label": "From email",
+      "required": false,
+      "secret": false
+    }
+  ],
+  "settings": []
+}

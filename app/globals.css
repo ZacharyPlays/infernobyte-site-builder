@@ -1,0 +1,23 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #111827;
+  line-height: 1.5;
+}
+
+a {
+  color: inherit;
+}
+
+.demo-banner {
+  background: #fef3c7;
+  color: #92400e;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #fcd34d;
+}
