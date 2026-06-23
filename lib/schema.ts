@@ -92,10 +92,6 @@ export function isDemoMode(): boolean {
   return process.env.INFERNOBYTE_DEMO_MODE === "true";
 }
 
-export function authEnabled(): boolean {
-  return Boolean(process.env.JWT_SECRET?.trim() && process.env.ADMIN_EMAIL?.trim());
-}
-
 export function paymentsEnabled(): boolean {
   return Boolean(
     process.env.SQUARE_APPLICATION_ID?.trim() &&

@@ -3,6 +3,12 @@ import { cookies } from "next/headers";
 
 const COOKIE = "site_session";
 
+export function authEnabled(): boolean {
+  return Boolean(
+    process.env.JWT_SECRET?.trim() && process.env.ADMIN_EMAIL?.trim(),
+  );
+}
+
 function secretKey(): Uint8Array | null {
   const s = process.env.JWT_SECRET?.trim();
   if (!s) return null;
