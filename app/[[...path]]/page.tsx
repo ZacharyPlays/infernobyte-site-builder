@@ -1,5 +1,8 @@
 import { fetchPublishedSchema, findPage, isDemoMode } from "@/lib/schema";
+import { fetchSiteStatus, isPreviewMode } from "@/lib/panel-client";
 import { RenderPage } from "@/lib/blocks";
+import { BuildingScreen } from "@/components/OnSiteSetup";
+import { redirect } from "next/navigation";
 
 export default async function Page({
   params,
@@ -7,15 +10,27 @@ export default async function Page({
   params: Promise<{ path?: string[] }>;
 }) {
   const { path } = await params;
+
+  if (!isPreviewMode()) {
+    const status = await fetchSiteStatus();
+    if (status && !status.siteLive) {
+      return <BuildingScreen status={status.deploymentStatus} />;
+    }
+    if (status && !status.setupComplete) {
+      redirect("/setup");
+    }
+  }
+
   const schema = await fetchPublishedSchema();
 
   if (!schema || schema.pages.length === 0) {
+    if (!isPreviewMode()) {
+      redirect("/setup");
+    }
     return (
       <main style={{ padding: "4rem 2rem", textAlign: "center" }}>
         <h1>Site coming soon</h1>
-        <p style={{ color: "#6b7280" }}>
-          Publish your design from the InfernoByte dashboard.
-        </p>
+        <p style={{ color: "#6b7280" }}>Preview mode — no published schema yet.</p>
       </main>
     );
   }
