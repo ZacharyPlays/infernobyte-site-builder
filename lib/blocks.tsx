@@ -180,7 +180,7 @@ function Footer({ siteName, tagline }: BlockProps) {
   );
 }
 
-const BLOCKS: Record<string, React.ComponentType<BlockProps>> = {
+export const BLOCKS: Record<string, React.ComponentType<BlockProps>> = {
   Navbar,
   Hero,
   Text,

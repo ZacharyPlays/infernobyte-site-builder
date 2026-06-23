@@ -1,4 +1,5 @@
 import { createHmac } from "crypto";
+import type { SiteBuilderSchema } from "@/lib/schema";
 
 const PRODUCTION_PANEL_URL = "https://infernobyte.com";
 const PANEL_FETCH_MS = 6_000;
@@ -170,6 +171,60 @@ export async function saveSiteConfig(body: {
   } catch {
     return { ok: false, error: "Could not reach InfernoByte" };
   }
+}
+
+export type BuilderData = {
+  themeId: string;
+  themes: { id: string; label: string }[];
+  draft: SiteBuilderSchema;
+  published: SiteBuilderSchema;
+  addons: Record<string, unknown>;
+  setupComplete: boolean;
+  siteName: string;
+  liveUrl: string | null;
+};
+
+async function signedMutate(
+  path: string,
+  method: "PUT" | "POST",
+  body: unknown,
+): Promise<{ ok: boolean; error?: string }> {
+  const url = signedUrl(path);
+  if (!url) {
+    if (!credentials()) return { ok: false, error: "Site not linked to InfernoByte yet" };
+    return { ok: false, error: "Panel URL is not configured" };
+  }
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    });
+    const json = (await res.json().catch(() => ({}))) as { error?: string };
+    if (!res.ok) return { ok: false, error: json.error || "Request failed" };
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "Could not reach InfernoByte" };
+  }
+}
+
+export async function fetchBuilderData(): Promise<BuilderData | null> {
+  const { data } = await panelFetch<BuilderData>("/api/site-builder/builder");
+  return data;
+}
+
+export async function saveBuilderDraft(
+  draft: unknown,
+): Promise<{ ok: boolean; error?: string }> {
+  return signedMutate("/api/site-builder/builder", "PUT", { draft });
+}
+
+export async function publishBuilderDraft(): Promise<{
+  ok: boolean;
+  error?: string;
+}> {
+  return signedMutate("/api/site-builder/builder", "POST", { action: "publish" });
 }
 
 export function isPreviewMode(): boolean {

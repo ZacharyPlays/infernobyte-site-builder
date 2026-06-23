@@ -8,6 +8,7 @@
     "start": "next start -p ${PORT:-3000}"
   },
   "dependencies": {
+    "@measured/puck": "^0.20.2",
     "bcryptjs": "^2.4.3",
     "jose": "^5.9.6",
     "mongodb": "^6.12.0",

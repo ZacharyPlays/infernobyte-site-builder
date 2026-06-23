@@ -1,0 +1,15 @@
+<svg width="1200" height="480" viewBox="0 0 1200 480" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hero image placeholder">
+  <defs>
+    <linearGradient id="hero" x1="0" y1="0" x2="1200" y2="480" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#eef2ff"/>
+      <stop offset="1" stop-color="#e0e7ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="480" fill="url(#hero)"/>
+  <circle cx="930" cy="120" r="180" fill="#c7d2fe" opacity="0.55"/>
+  <circle cx="1080" cy="360" r="120" fill="#a5b4fc" opacity="0.4"/>
+  <rect x="120" y="180" width="360" height="26" rx="13" fill="#c7d2fe"/>
+  <rect x="120" y="226" width="240" height="26" rx="13" fill="#dbeafe"/>
+  <rect x="120" y="292" width="150" height="44" rx="22" fill="#6366f1"/>
+  <text x="600" y="450" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" fill="#818cf8">Your hero image</text>
+</svg>

@@ -1,0 +1,172 @@
+:root {
+  --ib-black: #09090b;
+  --ib-dark-900: #18181b;
+  --ib-dark-800: #27272a;
+  --ib-dark-700: #3f3f46;
+  --ib-red-600: #dc2626;
+  --ib-red-500: #ef4444;
+  --ib-red-400: #f87171;
+  --ib-text: #fafafa;
+  --ib-text-muted: #a1a1aa;
+}
+
+.ib-builder {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--ib-black);
+  color: var(--ib-text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* Branded header bar above the editor (the InfernoByte signature, not a watermark). */
+.ib-builder-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(180deg, var(--ib-dark-900) 0%, var(--ib-black) 100%);
+  border-bottom: 1px solid var(--ib-dark-800);
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.08);
+}
+
+.ib-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.ib-brand-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--ib-dark-900);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.18);
+}
+
+.ib-wordmark {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.ib-wordmark .inferno {
+  background: linear-gradient(90deg, var(--ib-red-500), var(--ib-red-400));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.ib-wordmark .byte {
+  color: var(--ib-text);
+}
+
+.ib-brand-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ib-text-muted);
+}
+
+.ib-builder-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.ib-status {
+  font-size: 0.8rem;
+  color: var(--ib-text-muted);
+  margin-right: 0.25rem;
+}
+
+.ib-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.95rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.ib-btn-ghost {
+  background: transparent;
+  border-color: var(--ib-dark-700);
+  color: var(--ib-text);
+}
+
+.ib-btn-ghost:hover {
+  border-color: rgba(239, 68, 68, 0.5);
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.ib-btn-primary {
+  background: var(--ib-red-500);
+  color: #fff;
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.3);
+}
+
+.ib-btn-primary:hover {
+  background: var(--ib-red-600);
+}
+
+.ib-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+  box-shadow: none;
+}
+
+.ib-builder-canvas {
+  flex: 1;
+  min-height: 0;
+}
+
+.ib-builder-center {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(180deg, var(--ib-dark-900) 0%, var(--ib-black) 100%);
+  color: var(--ib-text);
+}
+
+.ib-builder-center h1 {
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.ib-builder-center p {
+  color: var(--ib-text-muted);
+  max-width: 28rem;
+  margin: 0;
+}
+
+/* InfernoByte theming for the embedded Puck editor chrome. */
+.site-builder-puck {
+  height: 100%;
+  --puck-color-grey-01: #18181b;
+  --puck-color-grey-02: #27272a;
+  --puck-color-grey-03: #3f3f46;
+  --puck-color-grey-04: #71717a;
+  --puck-color-azure-05: #ef4444;
+  --puck-color-azure-06: #f87171;
+  --puck-color-azure-07: #fca5a5;
+}

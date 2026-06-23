@@ -1,0 +1,7 @@
+<svg width="600" height="600" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Product image placeholder">
+  <rect width="600" height="600" fill="#f8fafc"/>
+  <rect x="1" y="1" width="598" height="598" rx="12" stroke="#e2e8f0" stroke-width="2" fill="none"/>
+  <path d="M300 150l130 75v150l-130 75-130-75V225Z" fill="#e2e8f0"/>
+  <path d="M300 150l130 75-130 75-130-75Z" fill="#cbd5e1"/>
+  <text x="300" y="500" text-anchor="middle" font-family="system-ui, sans-serif" font-size="22" fill="#94a3b8">Product image</text>
+</svg>

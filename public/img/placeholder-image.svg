@@ -1,0 +1,7 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Image placeholder">
+  <rect width="800" height="600" fill="#f1f5f9"/>
+  <rect x="1" y="1" width="798" height="598" rx="12" stroke="#cbd5e1" stroke-width="2" fill="none"/>
+  <circle cx="300" cy="230" r="58" fill="#cbd5e1"/>
+  <path d="M150 470l160-180 120 130 90-80 160 130v50a20 20 0 0 1-20 20H170a20 20 0 0 1-20-20Z" fill="#cbd5e1"/>
+  <text x="400" y="540" text-anchor="middle" font-family="system-ui, sans-serif" font-size="24" fill="#94a3b8">Add your image</text>
+</svg>

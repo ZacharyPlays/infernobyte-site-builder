@@ -22,6 +22,7 @@ export type SiteBuilderSchema = {
     fontFamily: string;
     siteName: string;
     logoUrl?: string;
+    faviconUrl?: string;
   };
   pages: SiteBuilderPage[];
   navigation: { label: string; pageId: string }[];

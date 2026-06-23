@@ -72,7 +72,10 @@ export async function generateMetadata({
   const { path } = await params;
   const schema = await fetchPublishedSchema();
   const page = schema ? findPage(schema, path) : null;
+  const favicon = schema?.theme.faviconUrl?.trim();
   return {
     title: page?.title || schema?.theme.siteName || "Site",
+    // Customer-set favicon overrides the bundled default (app/icon.svg).
+    ...(favicon ? { icons: { icon: favicon } } : {}),
   };
 }
