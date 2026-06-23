@@ -7,6 +7,10 @@ import {
 import { OnSiteSetupWizard, BuildingScreen } from "@/components/OnSiteSetup";
 import { redirect } from "next/navigation";
 
+// Must render per-request: credentials live in the container's runtime env, which
+// is empty at build time. Static prerendering would bake a "missing_config" page.
+export const dynamic = "force-dynamic";
+
 const DEFAULT_THEMES = [
   { id: "business", label: "Business" },
   { id: "portfolio", label: "Portfolio" },

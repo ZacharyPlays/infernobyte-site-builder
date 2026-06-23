@@ -5,6 +5,9 @@ import {
   saveSiteConfig,
 } from "@/lib/panel-client";
 
+// Reads runtime credentials each call (used by the panel to probe link status).
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const [status, config] = await Promise.all([
     fetchSiteStatus(),

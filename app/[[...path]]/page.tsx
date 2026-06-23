@@ -4,6 +4,9 @@ import { RenderPage } from "@/lib/blocks";
 import { BuildingScreen } from "@/components/OnSiteSetup";
 import { redirect } from "next/navigation";
 
+// Render per-request — site status + credentials come from runtime env, not build time.
+export const dynamic = "force-dynamic";
+
 export default async function Page({
   params,
 }: {
