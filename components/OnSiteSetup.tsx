@@ -288,15 +288,15 @@ export function BuildingScreen({ status }: { status: string | null }) {
     },
     missing_config: {
       title: "Linking your site to InfernoByte",
-      body: "Server credentials are still being applied. Open your service in the InfernoByte dashboard, wait for the server to finish redeploying, or click Restart on the Server tab.",
+      body: "Server credentials are still being applied. Open your service in the InfernoByte dashboard, wait for the build to finish, or use Server → Redeploy. This page refreshes automatically.",
     },
     missing_panel_url: {
       title: "Linking your site to InfernoByte",
-      body: "The panel connection is being configured. If this lasts more than a few minutes, restart the server from your InfernoByte dashboard.",
+      body: "The panel connection is being configured. If this lasts more than a few minutes, use Server → Redeploy in your InfernoByte dashboard.",
     },
     auth_failed: {
       title: "Setup link expired",
-      body: "This site could not authenticate with InfernoByte. Restart the server from your dashboard to refresh credentials.",
+      body: "This site could not authenticate with InfernoByte. Use Server → Redeploy in your dashboard to refresh credentials.",
     },
   };
 
