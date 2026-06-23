@@ -274,6 +274,42 @@ export function OnSiteSetupWizard({
 export function BuildingScreen({ status }: { status: string | null }) {
   const [dots, setDots] = useState("");
 
+  const isProvisioning =
+    !status ||
+    status === "building" ||
+    status === "created" ||
+    status === "provisioning" ||
+    status === "stopped";
+
+  const statusCopy: Record<string, { title: string; body: string }> = {
+    connecting: {
+      title: "Connecting to InfernoByte",
+      body: "Your site is waiting to link with the InfernoByte panel. This page will refresh automatically.",
+    },
+    missing_config: {
+      title: "Finishing setup",
+      body: "Hosting is still being configured. If this lasts more than a few minutes, open your service in the InfernoByte dashboard and restart the server.",
+    },
+    missing_panel_url: {
+      title: "Finishing setup",
+      body: "The panel link for this site is not configured yet. Restart the server from your InfernoByte dashboard, then reload this page.",
+    },
+    auth_failed: {
+      title: "Setup link expired",
+      body: "This site could not authenticate with InfernoByte. Restart the server from your dashboard to refresh credentials.",
+    },
+  };
+
+  const copy =
+    status && statusCopy[status]
+      ? statusCopy[status]
+      : isProvisioning
+        ? {
+            title: "Your site is starting up",
+            body: "We're building your hosting environment. This usually takes a few minutes. This page will refresh automatically.",
+          }
+        : statusCopy.connecting;
+
   useEffect(() => {
     const id = setInterval(() => {
       setDots((d) => (d.length >= 3 ? "" : d + "."));
@@ -292,12 +328,12 @@ export function BuildingScreen({ status }: { status: string | null }) {
     <div className="setup-shell">
       <div className="setup-card building-card">
         <div className="building-spinner" aria-hidden />
-        <h1>Your site is starting up{dots}</h1>
-        <p className="setup-sub">
-          We&apos;re building your hosting environment. This usually takes a few
-          minutes. This page will refresh automatically.
-        </p>
-        {status ? (
+        <h1>
+          {copy.title}
+          {isProvisioning || status === "connecting" ? dots : ""}
+        </h1>
+        <p className="setup-sub">{copy.body}</p>
+        {status && !statusCopy[status] ? (
           <p className="setup-meta">Status: {status}</p>
         ) : null}
       </div>

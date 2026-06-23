@@ -32,6 +32,13 @@
       "managed": true
     },
     {
+      "key": "SITE_BUILDER_PANEL_URL",
+      "label": "InfernoByte panel URL",
+      "required": true,
+      "secret": false,
+      "managed": true
+    },
+    {
       "key": "SITE_SCHEMA_SECRET",
       "label": "Schema HMAC secret",
       "required": true,

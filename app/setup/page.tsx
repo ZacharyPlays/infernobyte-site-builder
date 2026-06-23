@@ -1,19 +1,37 @@
-import { fetchSiteConfig, fetchSiteStatus, isPreviewMode } from "@/lib/panel-client";
+import {
+  fetchSiteConfigDetailed,
+  fetchSiteStatusDetailed,
+  isPreviewMode,
+  panelConnectionErrorMessage,
+} from "@/lib/panel-client";
 import { OnSiteSetupWizard, BuildingScreen } from "@/components/OnSiteSetup";
 import { redirect } from "next/navigation";
+
+const DEFAULT_THEMES = [
+  { id: "business", label: "Business" },
+  { id: "portfolio", label: "Portfolio" },
+  { id: "store", label: "Store" },
+];
 
 export default async function SetupPage() {
   if (isPreviewMode()) {
     redirect("/");
   }
 
-  const status = await fetchSiteStatus();
+  const { status, error: statusError } = await fetchSiteStatusDetailed();
   if (status && !status.siteLive) {
     return <BuildingScreen status={status.deploymentStatus} />;
   }
 
-  const config = await fetchSiteConfig();
+  const { config, error: configError } = await fetchSiteConfigDetailed();
   if (!config) {
+    const reason = panelConnectionErrorMessage(configError || statusError);
+    if (reason === "missing_config" || reason === "missing_panel_url") {
+      return <BuildingScreen status={reason} />;
+    }
+    if (reason === "auth_failed") {
+      return <BuildingScreen status="auth_failed" />;
+    }
     return <BuildingScreen status="connecting" />;
   }
 
@@ -41,7 +59,7 @@ export default async function SetupPage() {
     <OnSiteSetupWizard
       initialThemeId={config.themeId}
       initialAddons={addons}
-      themes={config.themes}
+      themes={config.themes.length > 0 ? config.themes : DEFAULT_THEMES}
       designerUrl={config.designerUrl}
     />
   );
