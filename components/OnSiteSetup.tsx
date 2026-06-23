@@ -287,12 +287,12 @@ export function BuildingScreen({ status }: { status: string | null }) {
       body: "Your site is waiting to link with the InfernoByte panel. This page will refresh automatically.",
     },
     missing_config: {
-      title: "Finishing setup",
-      body: "Hosting is still being configured. If this lasts more than a few minutes, open your service in the InfernoByte dashboard and restart the server.",
+      title: "Linking your site to InfernoByte",
+      body: "Server credentials are still being applied. Open your service in the InfernoByte dashboard, wait for the server to finish redeploying, or click Restart on the Server tab.",
     },
     missing_panel_url: {
-      title: "Finishing setup",
-      body: "The panel link for this site is not configured yet. Restart the server from your InfernoByte dashboard, then reload this page.",
+      title: "Linking your site to InfernoByte",
+      body: "The panel connection is being configured. If this lasts more than a few minutes, restart the server from your InfernoByte dashboard.",
     },
     auth_failed: {
       title: "Setup link expired",

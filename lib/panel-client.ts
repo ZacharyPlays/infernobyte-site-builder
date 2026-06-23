@@ -1,5 +1,8 @@
 import { createHmac } from "crypto";
 
+const PRODUCTION_PANEL_URL = "https://infernobyte.com";
+const PANEL_FETCH_MS = 6_000;
+
 function credentials() {
   const orderId = process.env.SITE_ORDER_ID?.trim();
   const secret = process.env.SITE_SCHEMA_SECRET?.trim();
@@ -38,6 +41,10 @@ export function panelBaseUrl(): string {
     process.env.SITE_PANEL_URL?.trim().replace(/\/$/, "") || "";
   if (fallback && (!isProductionRuntime() || !isLoopbackUrl(fallback))) {
     return fallback;
+  }
+
+  if (isProductionRuntime()) {
+    return PRODUCTION_PANEL_URL;
   }
 
   return "";
@@ -99,7 +106,10 @@ async function panelFetch<T>(
     return { data: null, error: "missing_panel_url" };
   }
   try {
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(url, {
+      cache: "no-store",
+      signal: AbortSignal.timeout(PANEL_FETCH_MS),
+    });
     if (res.status === 403 || res.status === 401) {
       return { data: null, error: "forbidden" };
     }
