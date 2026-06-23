@@ -70,6 +70,44 @@ export function OnSiteSetupWizard({
     router.refresh();
   }
 
+  // Skip = go live with the current theme and no half-configured add-ons, then
+  // land on the live site (not the InfernoByte dashboard). Disabling incomplete
+  // optional features keeps the "complete setup" save from being rejected.
+  async function skip() {
+    setBusy(true);
+    setError("");
+    const safeAddons: Addons = {
+      ...addons,
+      auth: addons.auth && Boolean(addons.adminEmail?.trim()),
+      payments:
+        addons.payments &&
+        Boolean(
+          addons.squareApplicationId?.trim() &&
+            addons.squareAccessToken?.trim() &&
+            addons.squareLocationId?.trim(),
+        ),
+      email:
+        addons.email &&
+        Boolean(addons.resendApiKey?.trim() && addons.fromEmail?.trim()),
+    };
+    const res = await fetch("/api/site-setup", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        themeId: theme,
+        addons: safeAddons,
+        completeSetup: true,
+      }),
+    });
+    const json = (await res.json().catch(() => ({}))) as { error?: string };
+    setBusy(false);
+    if (!res.ok) {
+      setError(json.error || "Could not skip setup");
+      return;
+    }
+    window.location.href = "/";
+  }
+
   return (
     <div className="setup-shell">
       <div className="setup-card">
@@ -228,12 +266,10 @@ export function OnSiteSetupWizard({
           <button
             type="button"
             className="btn-ghost"
-            onClick={() => {
-              if (designerUrl) window.location.href = designerUrl;
-              else router.push("/");
-            }}
+            disabled={busy}
+            onClick={() => void skip()}
           >
-            Skip for now
+            {busy ? "Saving…" : "Skip for now"}
           </button>
           <div className="setup-nav">
             {step !== "theme" ? (
