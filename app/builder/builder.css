@@ -11,16 +11,18 @@
 }
 
 .ib-builder {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   background: var(--ib-black);
   color: var(--ib-text);
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-/* Branded header bar above the editor (the InfernoByte signature, not a watermark). */
+/* Top bar — InfernoByte signature, matched to the main site. */
 .ib-builder-header {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -41,12 +43,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
   background: var(--ib-dark-900);
   border: 1px solid rgba(239, 68, 68, 0.35);
   box-shadow: 0 0 16px rgba(239, 68, 68, 0.18);
+}
+
+.ib-brand-text {
+  display: flex;
+  flex-direction: column;
 }
 
 .ib-wordmark {
@@ -68,9 +75,8 @@
 }
 
 .ib-brand-sub {
-  display: block;
-  margin-top: 2px;
-  font-size: 0.7rem;
+  margin-top: 3px;
+  font-size: 0.68rem;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -130,11 +136,264 @@
   box-shadow: none;
 }
 
-.ib-builder-canvas {
-  flex: 1;
+/* Three-pane body: palette | preview | inspector. */
+.ib-builder-body {
+  flex: 1 1 auto;
   min-height: 0;
+  display: grid;
+  grid-template-columns: 240px 1fr 300px;
 }
 
+.ib-panel {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1rem;
+  background: var(--ib-dark-900);
+}
+
+.ib-palette {
+  border-right: 1px solid var(--ib-dark-800);
+}
+
+.ib-inspector {
+  border-left: 1px solid var(--ib-dark-800);
+}
+
+.ib-panel-title {
+  margin: 0 0 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ib-text-muted);
+}
+
+.ib-palette-group {
+  margin-bottom: 1.25rem;
+}
+
+.ib-palette-label {
+  margin: 0 0 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ib-red-400);
+}
+
+.ib-palette-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.ib-palette-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border-radius: 9px;
+  border: 1px solid var(--ib-dark-700);
+  background: var(--ib-dark-800);
+  color: var(--ib-text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ib-palette-item:hover {
+  border-color: rgba(239, 68, 68, 0.5);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.ib-plus {
+  color: var(--ib-red-400);
+  font-weight: 700;
+}
+
+/* Preview pane. */
+.ib-preview-wrap {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1.75rem;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(239, 68, 68, 0.06), transparent 55%),
+    var(--ib-black);
+}
+
+.ib-preview-frame {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: #fff;
+  color: #111827;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.ib-preview-empty {
+  padding: 5rem 2rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+.ib-preview-empty h2 {
+  margin: 0 0 0.5rem;
+  color: #374151;
+}
+
+/* Selectable block wrapper in the preview. */
+.ib-block {
+  position: relative;
+  cursor: pointer;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  transition: outline-color 0.12s ease;
+}
+
+.ib-block:hover {
+  outline-color: rgba(239, 68, 68, 0.35);
+}
+
+.ib-block.selected {
+  outline-color: var(--ib-red-500);
+}
+
+.ib-block-tag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #fff;
+  background: var(--ib-red-500);
+  border-bottom-right-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.ib-block:hover .ib-block-tag,
+.ib-block.selected .ib-block-tag {
+  opacity: 1;
+}
+
+.ib-block-tools {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  z-index: 3;
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.ib-block:hover .ib-block-tools,
+.ib-block.selected .ib-block-tools {
+  opacity: 1;
+}
+
+.ib-block-tools button {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  border: 1px solid var(--ib-dark-700);
+  background: rgba(9, 9, 11, 0.85);
+  color: var(--ib-text);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.ib-block-tools button:hover {
+  border-color: var(--ib-red-500);
+}
+
+.ib-block-tools button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.ib-block-tools button.danger:hover {
+  background: var(--ib-red-600);
+  border-color: var(--ib-red-600);
+}
+
+.ib-block-render {
+  pointer-events: none;
+}
+
+.ib-block-unknown {
+  padding: 1.5rem;
+  text-align: center;
+  color: #b91c1c;
+  background: #fef2f2;
+  font-size: 0.875rem;
+}
+
+/* Inspector fields. */
+.ib-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.ib-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.ib-field-label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--ib-text-muted);
+}
+
+.ib-input {
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid var(--ib-dark-700);
+  background: var(--ib-dark-800);
+  color: var(--ib-text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.ib-input:focus {
+  outline: none;
+  border-color: var(--ib-red-500);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.ib-delete-btn {
+  margin-top: 1.25rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.ib-inspector-empty .ib-muted {
+  color: var(--ib-text-muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.ib-muted {
+  color: var(--ib-text-muted);
+}
+
+/* Full-screen status views (loading / error). */
 .ib-builder-center {
   min-height: 100vh;
   display: flex;
@@ -159,14 +418,19 @@
   margin: 0;
 }
 
-/* InfernoByte theming for the embedded Puck editor chrome. */
-.site-builder-puck {
-  height: 100%;
-  --puck-color-grey-01: #18181b;
-  --puck-color-grey-02: #27272a;
-  --puck-color-grey-03: #3f3f46;
-  --puck-color-grey-04: #71717a;
-  --puck-color-azure-05: #ef4444;
-  --puck-color-azure-06: #f87171;
-  --puck-color-azure-07: #fca5a5;
+/* Builder-local scrollbars to match the main site. */
+.ib-panel::-webkit-scrollbar,
+.ib-preview-wrap::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ib-panel::-webkit-scrollbar-thumb,
+.ib-preview-wrap::-webkit-scrollbar-thumb {
+  background: var(--ib-dark-700);
+  border-radius: 4px;
+}
+
+.ib-panel::-webkit-scrollbar-thumb:hover,
+.ib-preview-wrap::-webkit-scrollbar-thumb:hover {
+  background: var(--ib-red-500);
 }

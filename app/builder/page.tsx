@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { builderConfigured, hasBuilderSession } from "@/lib/builder-auth";
 import Logo from "@/components/Logo";
 import { BuilderEditor } from "./BuilderEditor";
-import "@measured/puck/puck.css";
 import "./builder.css";
 
 export const dynamic = "force-dynamic";
