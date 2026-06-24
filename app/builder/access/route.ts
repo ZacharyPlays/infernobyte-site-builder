@@ -3,6 +3,13 @@ import { startBuilderSession, verifyAccessSignature } from "@/lib/builder-auth";
 
 export const dynamic = "force-dynamic";
 
+// Relative redirect — building an absolute URL from req.url would use the
+// container's internal bind address (e.g. 0.0.0.0:8080) instead of the public
+// host. A relative Location keeps the browser on the customer's real domain.
+function relativeRedirect(path: string): NextResponse {
+  return new NextResponse(null, { status: 303, headers: { Location: path } });
+}
+
 /**
  * Handoff endpoint. The InfernoByte dashboard links here with a short-lived HMAC
  * token; we verify it, set an HttpOnly session cookie, then redirect to a clean
@@ -14,9 +21,9 @@ export async function GET(req: NextRequest) {
   const t = Number(req.nextUrl.searchParams.get("t")?.trim() || "");
 
   if (!verifyAccessSignature(orderId, t, sig)) {
-    return NextResponse.redirect(new URL("/builder/denied", req.url));
+    return relativeRedirect("/builder/denied");
   }
 
   await startBuilderSession();
-  return NextResponse.redirect(new URL("/builder", req.url));
+  return relativeRedirect("/builder");
 }

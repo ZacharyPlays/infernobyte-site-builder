@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 
 type ThemeOption = { id: string; label: string };
 
-type Addons = {
+export type Addons = {
   auth: boolean;
   payments: boolean;
   email: boolean;
@@ -16,6 +15,12 @@ type Addons = {
   squareLocationId?: string;
   resendApiKey?: string;
   fromEmail?: string;
+};
+
+export type SetupSavePayload = {
+  themeId: string;
+  addons: Addons;
+  completeSetup: boolean;
 };
 
 const STEPS = ["theme", "auth", "payments", "email", "redis", "done"] as const;
@@ -34,14 +39,15 @@ export function OnSiteSetupWizard({
   initialThemeId,
   initialAddons,
   themes,
-  designerUrl,
+  onSave,
+  onComplete,
 }: {
   initialThemeId: string;
   initialAddons: Addons;
   themes: ThemeOption[];
-  designerUrl: string | null;
+  onSave: (payload: SetupSavePayload) => Promise<{ ok: boolean; error?: string }>;
+  onComplete: () => void;
 }) {
-  const router = useRouter();
   const [step, setStep] = useState<Step>("theme");
   const [theme, setTheme] = useState(initialThemeId || "business");
   const [addons, setAddons] = useState<Addons>(initialAddons);
@@ -51,28 +57,18 @@ export function OnSiteSetupWizard({
   async function finish() {
     setBusy(true);
     setError("");
-    const res = await fetch("/api/site-setup", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ themeId: theme, addons, completeSetup: true }),
-    });
-    const json = (await res.json().catch(() => ({}))) as { error?: string };
+    const res = await onSave({ themeId: theme, addons, completeSetup: true });
     setBusy(false);
     if (!res.ok) {
-      setError(json.error || "Could not save setup");
+      setError(res.error || "Could not save setup");
       return;
     }
-    if (designerUrl) {
-      window.location.href = designerUrl;
-      return;
-    }
-    router.push("/");
-    router.refresh();
+    onComplete();
   }
 
-  // Skip = go live with the current theme and no half-configured add-ons, then
-  // land on the live site (not the InfernoByte dashboard). Disabling incomplete
-  // optional features keeps the "complete setup" save from being rejected.
+  // Skip = go live with the current theme and no half-configured add-ons.
+  // Disabling incomplete optional features keeps the "complete setup" save from
+  // being rejected by validation.
   async function skip() {
     setBusy(true);
     setError("");
@@ -90,22 +86,17 @@ export function OnSiteSetupWizard({
         addons.email &&
         Boolean(addons.resendApiKey?.trim() && addons.fromEmail?.trim()),
     };
-    const res = await fetch("/api/site-setup", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        themeId: theme,
-        addons: safeAddons,
-        completeSetup: true,
-      }),
+    const res = await onSave({
+      themeId: theme,
+      addons: safeAddons,
+      completeSetup: true,
     });
-    const json = (await res.json().catch(() => ({}))) as { error?: string };
     setBusy(false);
     if (!res.ok) {
-      setError(json.error || "Could not skip setup");
+      setError(res.error || "Could not skip setup");
       return;
     }
-    window.location.href = "/";
+    onComplete();
   }
 
   return (
@@ -302,6 +293,31 @@ export function OnSiteSetupWizard({
             )}
           </div>
         </footer>
+      </div>
+    </div>
+  );
+}
+
+/** Shown on the public domain while the owner hasn't finished setup yet. */
+export function SetupPendingScreen() {
+  useEffect(() => {
+    const id = setInterval(() => window.location.reload(), 15000);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <div className="setup-shell">
+      <div className="setup-card building-card">
+        <div className="building-spinner" aria-hidden />
+        <h1>This site is being set up</h1>
+        <p className="setup-sub">
+          The owner is still finishing setup. Please check back soon — this page
+          refreshes automatically.
+        </p>
+        <p className="setup-meta">
+          Are you the owner? Open the page designer from your InfernoByte
+          dashboard to finish setup and publish your site.
+        </p>
       </div>
     </div>
   );

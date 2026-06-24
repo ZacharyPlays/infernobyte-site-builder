@@ -220,6 +220,15 @@ export async function saveBuilderDraft(
   return signedMutate("/api/site-builder/builder", "PUT", { draft });
 }
 
+export async function saveBuilderConfig(payload: {
+  themeId?: string;
+  draft?: unknown;
+  addons?: unknown;
+  completeSetup?: boolean;
+}): Promise<{ ok: boolean; error?: string }> {
+  return signedMutate("/api/site-builder/builder", "PUT", payload);
+}
+
 export async function publishBuilderDraft(): Promise<{
   ok: boolean;
   error?: string;

@@ -1,8 +1,7 @@
 import { fetchPublishedSchema, findPage, isDemoMode } from "@/lib/schema";
 import { fetchSiteStatus, isPreviewMode } from "@/lib/panel-client";
 import { RenderPage } from "@/lib/blocks";
-import { BuildingScreen } from "@/components/OnSiteSetup";
-import { redirect } from "next/navigation";
+import { BuildingScreen, SetupPendingScreen } from "@/components/OnSiteSetup";
 
 // Render per-request — site status + credentials come from runtime env, not build time.
 export const dynamic = "force-dynamic";
@@ -19,8 +18,11 @@ export default async function Page({
     if (status && !status.siteLive) {
       return <BuildingScreen status={status.deploymentStatus} />;
     }
+    // Setup now lives inside the authenticated builder. Until the owner finishes
+    // it, the public domain shows a "being set up" gate (with a pointer to the
+    // dashboard) instead of the wizard or a half-configured site.
     if (status && !status.setupComplete) {
-      redirect("/setup");
+      return <SetupPendingScreen />;
     }
   }
 
@@ -28,7 +30,7 @@ export default async function Page({
 
   if (!schema || schema.pages.length === 0) {
     if (!isPreviewMode()) {
-      redirect("/setup");
+      return <SetupPendingScreen />;
     }
     return (
       <main style={{ padding: "4rem 2rem", textAlign: "center" }}>

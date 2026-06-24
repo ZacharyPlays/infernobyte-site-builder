@@ -4,24 +4,52 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Puck, type Data } from "@measured/puck";
 import { createPuckConfig } from "@/lib/puck-config";
 import type { SiteBuilderSchema, SiteBuilderPage } from "@/lib/schema";
+import {
+  OnSiteSetupWizard,
+  type Addons,
+  type SetupSavePayload,
+} from "@/components/OnSiteSetup";
 import Logo from "@/components/Logo";
+
+type ThemeOption = { id: string; label: string };
 
 type LoadedData = {
   draft: SiteBuilderSchema;
   siteName: string;
   liveUrl: string | null;
+  setupComplete: boolean;
+  themeId: string;
+  themes: ThemeOption[];
+  addons: Addons;
 };
 
-function BrandHeader({
-  status,
-  liveUrl,
-  publishing,
-  onPublish,
+const DEFAULT_THEMES: ThemeOption[] = [
+  { id: "business", label: "Business" },
+  { id: "portfolio", label: "Portfolio" },
+  { id: "store", label: "Store" },
+];
+
+function toAddons(raw: unknown): Addons {
+  const o = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  const str = (v: unknown) => (typeof v === "string" ? v : undefined);
+  return {
+    auth: Boolean(o.auth),
+    payments: Boolean(o.payments),
+    email: Boolean(o.email),
+    redis: Boolean(o.redis),
+    adminEmail: str(o.adminEmail),
+    squareApplicationId: str(o.squareApplicationId),
+    squareAccessToken: str(o.squareAccessToken),
+    squareLocationId: str(o.squareLocationId),
+    resendApiKey: str(o.resendApiKey),
+    fromEmail: str(o.fromEmail),
+  };
+}
+
+function BrandBar({
+  children,
 }: {
-  status: string;
-  liveUrl: string | null;
-  publishing: boolean;
-  onPublish: () => void;
+  children?: React.ReactNode;
 }) {
   return (
     <header className="ib-builder-header">
@@ -37,34 +65,13 @@ function BrandHeader({
           <span className="ib-brand-sub">Page Designer</span>
         </span>
       </div>
-      <div className="ib-builder-actions">
-        {status ? <span className="ib-status">{status}</span> : null}
-        {liveUrl ? (
-          <a
-            className="ib-btn ib-btn-ghost"
-            href={liveUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            View site
-          </a>
-        ) : null}
-        <button
-          type="button"
-          className="ib-btn ib-btn-primary"
-          disabled={publishing}
-          onClick={onPublish}
-        >
-          {publishing ? "Publishing…" : "Publish"}
-        </button>
-      </div>
+      <div className="ib-builder-actions">{children}</div>
     </header>
   );
 }
 
 export function BuilderEditor() {
-  const [schema, setSchema] = useState<SiteBuilderSchema | null>(null);
-  const [liveUrl, setLiveUrl] = useState<string | null>(null);
+  const [data, setData] = useState<LoadedData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
@@ -72,17 +79,36 @@ export function BuilderEditor() {
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latest = useRef<SiteBuilderSchema | null>(null);
 
+  const load = useCallback(async () => {
+    const res = await fetch("/api/builder", { cache: "no-store" });
+    if (!res.ok) throw new Error("load failed");
+    const json = (await res.json()) as {
+      draft: SiteBuilderSchema;
+      siteName: string;
+      liveUrl: string | null;
+      setupComplete: boolean;
+      themeId: string;
+      themes: ThemeOption[];
+      addons: unknown;
+    };
+    const loaded: LoadedData = {
+      draft: json.draft,
+      siteName: json.siteName,
+      liveUrl: json.liveUrl,
+      setupComplete: json.setupComplete,
+      themeId: json.themeId || "business",
+      themes: json.themes?.length ? json.themes : DEFAULT_THEMES,
+      addons: toAddons(json.addons),
+    };
+    latest.current = loaded.draft;
+    setData(loaded);
+  }, []);
+
   useEffect(() => {
     let active = true;
     (async () => {
       try {
-        const res = await fetch("/api/builder", { cache: "no-store" });
-        if (!res.ok) throw new Error("load failed");
-        const data = (await res.json()) as LoadedData;
-        if (!active) return;
-        setSchema(data.draft);
-        latest.current = data.draft;
-        setLiveUrl(data.liveUrl);
+        await load();
       } catch {
         if (active) {
           setError(
@@ -96,7 +122,7 @@ export function BuilderEditor() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [load]);
 
   const persist = useCallback(async (next: SiteBuilderSchema) => {
     const res = await fetch("/api/builder", {
@@ -117,23 +143,26 @@ export function BuilderEditor() {
     [persist],
   );
 
-  function handleChange(data: Data) {
-    if (!schema) return;
-    const page = schema.pages[0];
-    if (!page) return;
-    const updatedPage: SiteBuilderPage = {
-      ...page,
-      content: {
-        content: (data.content ?? []) as SiteBuilderPage["content"]["content"],
-        root: { props: data.root?.props ?? {} },
-      },
-    };
-    const next: SiteBuilderSchema = {
-      ...schema,
-      pages: schema.pages.map((p, i) => (i === 0 ? updatedPage : p)),
-    };
-    setSchema(next);
-    schedulePersist(next);
+  function handleChange(puckData: Data) {
+    setData((prev) => {
+      if (!prev) return prev;
+      const page = prev.draft.pages[0];
+      if (!page) return prev;
+      const updatedPage: SiteBuilderPage = {
+        ...page,
+        content: {
+          content: (puckData.content ??
+            []) as SiteBuilderPage["content"]["content"],
+          root: { props: puckData.root?.props ?? {} },
+        },
+      };
+      const nextDraft: SiteBuilderSchema = {
+        ...prev.draft,
+        pages: prev.draft.pages.map((p, i) => (i === 0 ? updatedPage : p)),
+      };
+      schedulePersist(nextDraft);
+      return { ...prev, draft: nextDraft };
+    });
   }
 
   async function handlePublish() {
@@ -154,6 +183,29 @@ export function BuilderEditor() {
     }
   }
 
+  const saveSetup = useCallback(
+    async (payload: SetupSavePayload) => {
+      const res = await fetch("/api/builder", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const json = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) return { ok: false, error: json.error };
+      return { ok: true };
+    },
+    [],
+  );
+
+  const finishSetup = useCallback(() => {
+    setLoading(true);
+    load()
+      .catch(() =>
+        setError("Setup saved, but reloading the designer failed. Refresh the page."),
+      )
+      .finally(() => setLoading(false));
+  }, [load]);
+
   if (loading) {
     return (
       <div className="ib-builder-center">
@@ -165,29 +217,74 @@ export function BuilderEditor() {
     );
   }
 
-  if (error || !schema || !schema.pages[0]) {
+  if (error || !data) {
     return (
       <div className="ib-builder-center">
         <span className="ib-brand-mark">
           <Logo size={28} />
         </span>
         <h1>Designer unavailable</h1>
-        <p>{error || "No page content was found for this site yet."}</p>
+        <p>{error || "Something went wrong loading your site."}</p>
       </div>
     );
   }
 
-  const config = createPuckConfig(schema.theme.primaryColor);
-  const page = schema.pages[0];
+  // Setup phase — runs inside the authenticated builder, not on the public site.
+  if (!data.setupComplete) {
+    return (
+      <div className="ib-builder">
+        <BrandBar />
+        <div className="ib-builder-canvas">
+          <OnSiteSetupWizard
+            initialThemeId={data.themeId}
+            initialAddons={data.addons}
+            themes={data.themes}
+            onSave={saveSetup}
+            onComplete={finishSetup}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (!data.draft.pages[0]) {
+    return (
+      <div className="ib-builder-center">
+        <span className="ib-brand-mark">
+          <Logo size={28} />
+        </span>
+        <h1>No page to edit yet</h1>
+        <p>Your site has no pages. Re-run setup from your dashboard.</p>
+      </div>
+    );
+  }
+
+  const config = createPuckConfig(data.draft.theme.primaryColor);
+  const page = data.draft.pages[0];
 
   return (
     <div className="ib-builder">
-      <BrandHeader
-        status={status}
-        liveUrl={liveUrl}
-        publishing={publishing}
-        onPublish={handlePublish}
-      />
+      <BrandBar>
+        {status ? <span className="ib-status">{status}</span> : null}
+        {data.liveUrl ? (
+          <a
+            className="ib-btn ib-btn-ghost"
+            href={data.liveUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            View site
+          </a>
+        ) : null}
+        <button
+          type="button"
+          className="ib-btn ib-btn-primary"
+          disabled={publishing}
+          onClick={handlePublish}
+        >
+          {publishing ? "Publishing…" : "Publish"}
+        </button>
+      </BrandBar>
       <div className="ib-builder-canvas site-builder-puck">
         <Puck
           config={config}

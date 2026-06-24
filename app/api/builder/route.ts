@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { hasBuilderSession } from "@/lib/builder-auth";
 import {
   fetchBuilderData,
-  saveBuilderDraft,
+  saveBuilderConfig,
   publishBuilderDraft,
 } from "@/lib/panel-client";
 
@@ -29,7 +29,14 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const body = await req.json().catch(() => ({}));
-  const result = await saveBuilderDraft(body.draft);
+  // Handles both the editor (draft autosave) and the in-builder setup wizard
+  // (themeId + addons + completeSetup).
+  const result = await saveBuilderConfig({
+    themeId: body.themeId,
+    draft: body.draft,
+    addons: body.addons,
+    completeSetup: body.completeSetup,
+  });
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: 400 });
   }
